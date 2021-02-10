@@ -1,0 +1,30 @@
+h1 {
+    background-color: rgb(15, 15, 15);
+    color: red;
+    text-align: center;
+    font-size: 100px;
+    }
+
+    h2 {
+      font-size: 50px;
+    }
+
+    img {
+        width: 150px;
+        height: 200px;
+      }
+
+      .choices {
+        
+      }
+    
+      p{
+        font-size: 30px;
+      }
+
+      div.scoreboard {
+        font-size: 25px;
+        border-style: dashed;
+        text-align: center;        
+              }
+

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game of War</title>
+    <link style="style sheet">
+    <link rel="stylesheet" href="sytle.css">
+ 
+</head>
+<body>
+    <header>
+        <div id="navigation" class="navigation">
+            <img id="casino-night-image" class="header-images" src="./Images/Casino Night.png">
+        </div>
+    </header>
+
+    <div id="money" class="money-display">
+        <!-- <label for="starting-money" id="starting-money-label" class="starting-money" >Starting Money</label> -->
+        <!-- <input id="starting-money" class="starting-money" name="starting-money" type="text">> -->
+       <h1 id="money-label" class="money-indicator">Money</h1>
+         <h2 id="money-amount" class="money-indicator">$0</h2>
+    </div>
+
+    <div id="card-table-container" class="card-table">
+        <img id="card-table" class="card-table" src="./Images/Black Jack Table.png" alt="Black Jack Table">
+            <img id="dealerCard-faceDown"src="./Images/Back of Playing Card.jpg" alt="Dealer Card Facing Down">
+            <img id="player1Card1" class="player1-Cards" src="./Images/AceHearts.png">
+        <div id="winLose-modal-container" class="winLosemodal">
+            <div id="winLoseModal" class="winLosemodal">
+                <p id="modal-paragraph" class="winLosemodal">Player 1 Wins</p>
+            </div>
+        </div>
+            
+    </div>
+
+ <div id="begin-modal-container" class="begin-modal">
+     <div id="begin-modal-box" class="begin-modal">
+         <h2>WELCOME TO CASINO NIGHT</h2>
+         <label for="player-name" id="label-player-name" class="begin-modal-content label">Enter Your Name</label>
+         <input id="player-name" value="Enter Your Name" class="begin-modal-content input">
+         <label for="beginning-money-input" class="begin-modal-content label">Enter Your Buy-In</label>
+         <input id="beginning-money-input" class="begin-modal-content input" value="Initial Buy In">
+         <button id="begin-submit-button" class="begin-modal-content">SUBMIT</button>
+         <h3 id="closeX" class="begin-modal-close">&times;</h3>
+     </div>
+
+ </div>
+   
+<script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="app.js" charset="utf-8"></script>
+</body>
+</html>
