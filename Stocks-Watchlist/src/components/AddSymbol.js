@@ -3,31 +3,33 @@ import App from '../pages/App';
 
 const AddSymbol = props => {
 	const [symbol, setSymbol] = useState([]);
+	//console.log(props);
 
 	const handleChange = event => {
-		console.log(event.target.value);
+		//console.log(event.target.value);
 		setSymbol(event.target.value);
 	};
 
 	const handleSubmit = event => {
 		event.preventDefault();
 		console.log('You clicked on submit');
-		console.log(event.target);
-		console.log(event.target.value);
+		props.onFormSubmit(symbol);
+		setSymbol([]);
 	};
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<div class="ui icon input">
+			<div className="ui icon input">
 				<input
 					id="symbol-search"
 					type="text"
 					placeholder="Symbol"
+					value={symbol}
 					onChange={handleChange}
 				/>
 				<i
 					onClick={handleSubmit}
-					class="inverted circular search link icon"
+					className="inverted circular search link icon"
 				></i>
 			</div>
 		</form>
