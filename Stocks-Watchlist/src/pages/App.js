@@ -3,6 +3,7 @@ import AddSymbol from '../components/AddSymbol';
 import DeleteSymbol from '../components/DeleteButton';
 import EditSymbol from '../components/EditButton';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const alpha = require('alphavantage')({
 	key: 'process.env.ALPHA_VANTAGE_API_KEY'
@@ -12,6 +13,13 @@ export default function App(props) {
 	const [stockList, setStockList] = useState([]);
 	const [symbolForSearch, setSymbolForSearch] = useState('');
 	const [dataFromAPI, setDataFromAPI] = useState([
+		{
+			symbol: '',
+			lastPrice: ''
+		}
+	]);
+
+	const [DBSymbolAdd, setDBSymbolAdd] = useState([
 		{
 			symbol: '',
 			lastPrice: ''
@@ -28,6 +36,15 @@ export default function App(props) {
 		console.log(symbolforSearch, 'is the symbol');
 		console.log(typeof symbolforSearch);
 		setSymbolForSearch(symbol);
+		console.log(DBSymbolAdd);
+		axios
+			.post('http://localhost:3000/api/stocks', DBSymbolAdd)
+			.then(res => {
+				console.log(res.data);
+			})
+			.catch(error => {
+				console.log(error);
+			});
 	};
 
 	const todayDate = () => {
@@ -62,6 +79,11 @@ export default function App(props) {
 										]
 								}
 							]);
+							setDBSymbolAdd({
+								symbol: symbolForSearch,
+								lastPrice:
+									data['Time Series (Daily)'][todayDate()]['5. adjusted close']
+							});
 						})
 					);
 				} catch (error) {
