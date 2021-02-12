@@ -11,6 +11,7 @@ const db = mongoose.connection;
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+	useFindAndModify: false
 });
 db.on('open', () => {
     console.log('Mongo is Connected');
@@ -22,12 +23,7 @@ if (process.env.NODE_ENV !== 'development'){
 }
 
 /* Controller Goes Here Remove the tes*/
-app.get('/test', (req, res)=>{
-	res.status(200).json({
-		website: 'My Website',
-		info: 'Not that much'
-	})
-})
+app.use('/api/stocks', require('./controllers/stockController')) // new require just like above he just put it inline
 /* Controller Ends here */
 //LISTENER
 

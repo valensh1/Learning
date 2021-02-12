@@ -29,9 +29,42 @@ body {
 
 }
 
+.total-container{
+  position: absolute;
+  left: 50%;
+}
+
 #symbol-search {
   text-transform: uppercase;
   background-color:teal;
-  color: white;
+  color:white
   font-style: italic;
 }
+
+ul {
+  display: inline-block;
+  margin-left: 1vw;
+  border: 1px solid black;
+  background-color: teal;
+  color: white;
+  font-style: italic;
+  li{
+    display: inline-block;
+    width: 186px;
+  }
+  button{
+    height: fit-content;
+    width: fit-content;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+

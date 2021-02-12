@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AddSymbol from '../components/AddSymbol';
+import DeleteSymbol from '../components/DeleteButton';
+import EditSymbol from '../components/EditButton';
+import { Link } from 'react-router-dom';
+
 const alpha = require('alphavantage')({
 	key: 'process.env.ALPHA_VANTAGE_API_KEY'
 });
@@ -7,7 +11,17 @@ const alpha = require('alphavantage')({
 export default function App(props) {
 	const [stockList, setStockList] = useState([]);
 	const [symbolForSearch, setSymbolForSearch] = useState('');
-	//need to add a useState here to then pass to where symbolforSearch is
+	const [dataFromAPI, setDataFromAPI] = useState([
+		{
+			symbol: '',
+			lastPrice: ''
+		}
+	]);
+
+	// console.log(dataFromAPI);
+	// const APIAsArray = Object.entries(dataFromAPI);
+	// console.log(APIAsArray[1][APIAsArray.length-1])
+
 	const onFormSubmit = symbol => {
 		setStockList([...stockList, symbol]);
 		let symbolforSearch = symbol;
@@ -16,19 +30,38 @@ export default function App(props) {
 		setSymbolForSearch(symbol);
 	};
 
-	useEffect(() => {
-		console.log('hello I am use effect');
-	}, [stockList]);
+	const todayDate = () => {
+		const previousDay = true; // CHANGE THIS HERE TO FALSE TO GET CURRENT DAY
+		var today = new Date();
+		const previousDayFlag = previousDay
+			? String(today.getDate() - 1).padStart(2, '0')
+			: String(today.getDate()).padStart(2, '0');
+		var dd = String(today.getDate()).padStart(2, '0'); // gets day of month - padStart inserts at beginning. First argument tells how long it shold be after insertion and 2nd argument is what do you want inserted
+		var mm = String(today.getMonth() + 1).padStart(2, '0'); // gets month - January is 0! . padStart inserts at beginning. First argument tells how long it shold be after insertion and 2nd argument is what do you want inserted
+		var yyyy = today.getFullYear(); // gets current year
+		let todaysDate = `${yyyy}-${mm}-${previousDayFlag}`;
+		return todaysDate;
+	};
 
 	useEffect(() => {
 		(async () => {
 			if (symbolForSearch) {
-				//need to add an if statement here so it doesn't update right away
 				try {
 					const response = await fetch(
 						alpha.data.daily_adjusted(symbolForSearch).then(data => {
 							console.log(response);
 							console.log(data);
+							//setDataFromAPI(data);
+							setDataFromAPI([
+								...dataFromAPI,
+								{
+									symbol: symbolForSearch,
+									lastPrice:
+										data['Time Series (Daily)'][todayDate()][
+											'5. adjusted close'
+										]
+								}
+							]);
 						})
 					);
 				} catch (error) {
@@ -39,23 +72,7 @@ export default function App(props) {
 	}, [stockList]);
 
 	let count = 1;
-
-	/*
-	useEffect(() => {
-		async () => {
-			try {
-				const response = await alpha.data.daily_adjusted(`wmt`).then(data => {
-					console.log(data);
-					console.log(response);
-					console.log(data['Time Series (Daily)']);
-					console.log(data['Time Series (Daily)']['2021-02-09']['1. open']);
-				});
-			} catch {
-				console.error(error);
-			}
-		};
-	}, [stockList]);
-	*/
+	console.log(dataFromAPI);
 
 	/*
 	alpha.data.daily_adjusted(`nflx`).then(data => {
@@ -66,11 +83,18 @@ export default function App(props) {
 	*/
 
 	return (
-		<div>
+		<div className="total-container">
 			<AddSymbol onFormSubmit={onFormSubmit} />
+			<br />
 			<ul>
 				{stockList.map(stock => {
-					return <li key={`${stock}${count++}`}>{stock.toUpperCase()}</li>;
+					return (
+						<div className="watchlist-container">
+							<li key={`${stock}${count++}`}>{stock.toUpperCase()}</li>
+							<DeleteSymbol />
+							<EditSymbol />
+						</div>
+					);
 				})}
 			</ul>
 		</div>
