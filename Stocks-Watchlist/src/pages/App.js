@@ -13,48 +13,14 @@ const APIKey = 'RIDXJ7V4EWS069FV';
 
 export default function App(props) {
 	const [stockList, setStockList] = useState([]); // sets state for total stock list to render
-	const [APIData, setAPIData] = useState([]);
 	const [DBSymbolAdd, setDBSymbolAdd] = useState({});
-	// sets state to send to MongoDB
-
-	/*
-	const APIDataPull = symbol => {
-		(async () => {
-			if (symbol) {
-				try {
-					console.log(symbol);
-					const response = await fetch(
-						alpha.data.daily_adjusted(symbol).then(data => {
-							console.log(response);
-							console.log(data);
-							setDBSymbolAdd({
-								symbol: symbol,
-								lastPrice:
-									data['Time Series (Daily)'][todayDate()]['5. adjusted close']
-							});
-						})
-					);
-				} catch (error) {
-					console.error(error);
-				}
-			}
-		})();
-	};
-	*/
 
 	const APIDataPull = async symbol => {
 		try {
-			console.log(`Line 47 ${symbol}`);
-			const upperCaseSymbol = symbol.toUpperCase();
-			console.log(upperCaseSymbol);
-			const data2Send = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${upperCaseSymbol}&apikey=${APIKey}`;
-			console.log(data2Send);
 			const response = await fetch(
-				`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${upperCaseSymbol}&apikey=${APIKey}`
+				`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol.toUpperCase()}&apikey=${APIKey}`
 			);
 			const data = await response.json();
-			console.log(data);
-			await setAPIData(data);
 			await setDBSymbolAdd({
 				symbol: symbol,
 				lastPrice: data['Time Series (Daily)'][todayDate()]['5. adjusted close']
@@ -81,9 +47,6 @@ export default function App(props) {
 		event.preventDefault();
 		await APIDataPull(symbol);
 		await setStockList([...stockList, symbol]);
-		console.log(symbol, 'is the symbol');
-		console.log(DBSymbolAdd);
-		//sendToDB();
 	};
 
 	const todayDate = () => {
@@ -163,4 +126,31 @@ export default function App(props) {
 			}
 		})();
 	}, [stockList]);
+	*/
+
+// sets state to send to MongoDB
+
+/* This was my most recent APIDataPull Function
+	const APIDataPull = symbol => {
+		(async () => {
+			if (symbol) {
+				try {
+					console.log(symbol);
+					const response = await fetch(
+						alpha.data.daily_adjusted(symbol).then(data => {
+							console.log(response);
+							console.log(data);
+							setDBSymbolAdd({
+								symbol: symbol,
+								lastPrice:
+									data['Time Series (Daily)'][todayDate()]['5. adjusted close']
+							});
+						})
+					);
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		})();
+	};
 	*/
