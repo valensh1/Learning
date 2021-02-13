@@ -13,7 +13,7 @@ const AddSymbol = props => {
 	const handleSubmit = event => {
 		event.preventDefault();
 		console.log('You clicked on submit');
-		props.onFormSubmit(symbol);
+		props.onFormSubmit(symbol, event);
 		setSymbol([]);
 	};
 

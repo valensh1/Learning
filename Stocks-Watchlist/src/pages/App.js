@@ -2,17 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import AddSymbol from '../components/AddSymbol';
 import DeleteSymbol from '../components/DeleteButton';
 import EditSymbol from '../components/EditButton';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import StockNews from './StockNews';
 
 const alpha = require('alphavantage')({
 	key: 'process.env.ALPHA_VANTAGE_API_KEY'
 });
 
 export default function App(props) {
-	const [stockList, setStockList] = useState([]);
-	const [symbolForSearch, setSymbolForSearch] = useState('');
+	const [stockList, setStockList] = useState([]); // sets state for total stock list to render
 	const [dataFromAPI, setDataFromAPI] = useState([
+		// sets state for relevant information basically just lastPrice from API
 		{
 			symbol: '',
 			lastPrice: ''
@@ -20,24 +21,49 @@ export default function App(props) {
 	]);
 
 	const [DBSymbolAdd, setDBSymbolAdd] = useState([
+		// sets state to send to MongoDB
 		{
 			symbol: '',
 			lastPrice: ''
 		}
 	]);
 
-	// console.log(dataFromAPI);
-	// const APIAsArray = Object.entries(dataFromAPI);
-	// console.log(APIAsArray[1][APIAsArray.length-1])
+	const APIDataPull = symbol => {
+		(async () => {
+			if (symbol) {
+				try {
+					console.log(symbol);
+					const response = await fetch(
+						alpha.data.daily_adjusted(symbol).then(data => {
+							console.log(response);
+							console.log(data);
+							//setDataFromAPI(data);
+							setDataFromAPI([
+								...dataFromAPI,
+								{
+									symbol: symbol,
+									lastPrice:
+										data['Time Series (Daily)'][todayDate()][
+											'5. adjusted close'
+										]
+								}
+							]);
+							setDBSymbolAdd({
+								symbol: symbol,
+								lastPrice:
+									data['Time Series (Daily)'][todayDate()]['5. adjusted close']
+							});
+						})
+					);
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		})();
+	};
 
-	const onFormSubmit = symbol => {
-		setStockList([...stockList, symbol]);
-		let symbolforSearch = symbol;
-		console.log(symbolforSearch, 'is the symbol');
-		console.log(typeof symbolforSearch);
-		setSymbolForSearch(symbol);
-		console.log(DBSymbolAdd);
-		axios
+	const sendToDB = async () => {
+		await axios
 			.post('http://localhost:3000/api/stocks', DBSymbolAdd)
 			.then(res => {
 				console.log(res.data);
@@ -45,6 +71,14 @@ export default function App(props) {
 			.catch(error => {
 				console.log(error);
 			});
+	};
+
+	const onFormSubmit = (symbol, event) => {
+		event.preventDefault();
+		APIDataPull(symbol);
+		setStockList([...stockList, symbol]);
+		console.log(symbol, 'is the symbol');
+		sendToDB();
 	};
 
 	const todayDate = () => {
@@ -60,6 +94,38 @@ export default function App(props) {
 		return todaysDate;
 	};
 
+	let count = 1;
+
+	return (
+		<div className="total-container">
+			<AddSymbol onFormSubmit={onFormSubmit} />
+			<br />
+			<ul>
+				{stockList.map(stock => {
+					return (
+						<div className="watchlist-container">
+							<Link to={'/stocknews'}>
+								<li key={`${stock}${count++}`}>{stock.toUpperCase()}</li>
+							</Link>
+							<DeleteSymbol />
+							<EditSymbol />
+						</div>
+					);
+				})}
+			</ul>
+		</div>
+	);
+}
+
+/*
+	alpha.data.daily_adjusted(`nflx`).then(data => {
+		console.log(data);
+		console.log(data['Time Series (Daily)']);
+		console.log(data['Time Series (Daily)']['2021-02-09']['1. open']);
+	});
+	*/
+
+/*
 	useEffect(() => {
 		(async () => {
 			if (symbolForSearch) {
@@ -69,7 +135,7 @@ export default function App(props) {
 							console.log(response);
 							console.log(data);
 							//setDataFromAPI(data);
-							setDataFromAPI([
+							await setDataFromAPI([
 								...dataFromAPI,
 								{
 									symbol: symbolForSearch,
@@ -79,7 +145,7 @@ export default function App(props) {
 										]
 								}
 							]);
-							setDBSymbolAdd({
+							await setDBSymbolAdd({
 								symbol: symbolForSearch,
 								lastPrice:
 									data['Time Series (Daily)'][todayDate()]['5. adjusted close']
@@ -92,33 +158,4 @@ export default function App(props) {
 			}
 		})();
 	}, [stockList]);
-
-	let count = 1;
-	console.log(dataFromAPI);
-
-	/*
-	alpha.data.daily_adjusted(`nflx`).then(data => {
-		console.log(data);
-		console.log(data['Time Series (Daily)']);
-		console.log(data['Time Series (Daily)']['2021-02-09']['1. open']);
-	});
 	*/
-
-	return (
-		<div className="total-container">
-			<AddSymbol onFormSubmit={onFormSubmit} />
-			<br />
-			<ul>
-				{stockList.map(stock => {
-					return (
-						<div className="watchlist-container">
-							<li key={`${stock}${count++}`}>{stock.toUpperCase()}</li>
-							<DeleteSymbol />
-							<EditSymbol />
-						</div>
-					);
-				})}
-			</ul>
-		</div>
-	);
-}
