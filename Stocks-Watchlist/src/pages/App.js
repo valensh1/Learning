@@ -9,25 +9,15 @@ import StockNews from './StockNews';
 const alpha = require('alphavantage')({
 	key: 'process.env.ALPHA_VANTAGE_API_KEY'
 });
+const APIKey = 'RIDXJ7V4EWS069FV';
 
 export default function App(props) {
 	const [stockList, setStockList] = useState([]); // sets state for total stock list to render
-	const [dataFromAPI, setDataFromAPI] = useState([
-		// sets state for relevant information basically just lastPrice from API
-		{
-			symbol: '',
-			lastPrice: ''
-		}
-	]);
+	const [APIData, setAPIData] = useState([]);
+	const [DBSymbolAdd, setDBSymbolAdd] = useState({});
+	// sets state to send to MongoDB
 
-	const [DBSymbolAdd, setDBSymbolAdd] = useState([
-		// sets state to send to MongoDB
-		{
-			symbol: '',
-			lastPrice: ''
-		}
-	]);
-
+	/*
 	const APIDataPull = symbol => {
 		(async () => {
 			if (symbol) {
@@ -37,17 +27,6 @@ export default function App(props) {
 						alpha.data.daily_adjusted(symbol).then(data => {
 							console.log(response);
 							console.log(data);
-							//setDataFromAPI(data);
-							setDataFromAPI([
-								...dataFromAPI,
-								{
-									symbol: symbol,
-									lastPrice:
-										data['Time Series (Daily)'][todayDate()][
-											'5. adjusted close'
-										]
-								}
-							]);
 							setDBSymbolAdd({
 								symbol: symbol,
 								lastPrice:
@@ -61,6 +40,31 @@ export default function App(props) {
 			}
 		})();
 	};
+	*/
+
+	const APIDataPull = async symbol => {
+		try {
+			console.log(`Line 47 ${symbol}`);
+			const upperCaseSymbol = symbol.toUpperCase();
+			console.log(upperCaseSymbol);
+			const data2Send = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${upperCaseSymbol}&apikey=${APIKey}`;
+			console.log(data2Send);
+			const response = await fetch(
+				`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${upperCaseSymbol}&apikey=${APIKey}`
+			);
+			const data = await response.json();
+			console.log(data);
+			await setAPIData(data);
+			await setDBSymbolAdd({
+				symbol: symbol,
+				lastPrice: data['Time Series (Daily)'][todayDate()]['5. adjusted close']
+			});
+		} catch (error) {
+			console.error(error);
+		} finally {
+			sendToDB();
+		}
+	};
 
 	const sendToDB = async () => {
 		await axios
@@ -73,12 +77,13 @@ export default function App(props) {
 			});
 	};
 
-	const onFormSubmit = (symbol, event) => {
+	const onFormSubmit = async (symbol, event) => {
 		event.preventDefault();
-		APIDataPull(symbol);
-		setStockList([...stockList, symbol]);
+		await APIDataPull(symbol);
+		await setStockList([...stockList, symbol]);
 		console.log(symbol, 'is the symbol');
-		sendToDB();
+		console.log(DBSymbolAdd);
+		//sendToDB();
 	};
 
 	const todayDate = () => {

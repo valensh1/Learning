@@ -10,6 +10,7 @@ const stockRouter = express.Router();
 stockRouter.post('/', async (req, res) => {
 	try {
 		const newStockPost = await Stock.create(req.body);
+        console.log(req.body);
 		res.status(200).json(newStockPost); // return json of our newly created blog so we can send to rest of app
 	} catch (error) {
 		res.status(400).json(error);
