@@ -43,8 +43,7 @@ export default function App(props) {
 			});
 	};
 
-	const onFormSubmit = async (symbol, event) => {
-		event.preventDefault();
+	const onFormSubmit = async (event, symbol) => {
 		await APIDataPull(symbol);
 		await setStockList([...stockList, symbol]);
 	};
